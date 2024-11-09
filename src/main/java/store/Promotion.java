@@ -25,7 +25,8 @@ public class Promotion {
         Date today = stringToDate(localDateToString(current_day));
         Date start = stringToDate(this.start_date);
         Date end = stringToDate(this.end_date);
-        if(today.after(start) && today.before(end)){
+        System.out.println(today);
+        if(!(today.after(end)) && !(today.before(start))){
             return true;
         }
         return false;

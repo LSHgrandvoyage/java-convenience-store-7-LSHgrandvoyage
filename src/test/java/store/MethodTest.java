@@ -4,6 +4,7 @@ import camp.nextstep.edu.missionutils.test.NsTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +44,24 @@ class MethodTest extends NsTest{
             run("[비타민워터-3],[물-2],[정식도시락-2]");
             Assertions.assertThat(output().replaceAll("\\s", "")).contains("[비타민워터-3],[물-2],[정식도시락-2]");
         });
+    }
+
+    @Test
+    public void testIsItPromotion() throws ParseException {
+        Promotion promotion = new Promotion("사과", 3, 1, "2024-11-10", "2024-12-31");
+        assertEquals(true, promotion.isItPromotion());
+    }
+
+    @Test
+    public void testIsItPromotion_1() throws ParseException {
+        Promotion promotion_1 = new Promotion("파인애플", 2, 1, "2024-01-01", "2024-11-10");
+        assertEquals(true, promotion_1.isItPromotion());
+    }
+
+    @Test
+    public void testIsItPromotion_2() throws ParseException {
+        Promotion promotion_2 = new Promotion("망고", 2, 1, "2025-01-01", "2025-11-10");
+        assertEquals(false, promotion_2.isItPromotion());
     }
 
     @Override
