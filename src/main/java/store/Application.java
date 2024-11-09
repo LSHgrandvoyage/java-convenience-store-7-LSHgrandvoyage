@@ -7,7 +7,6 @@ public class Application {
         // TODO: 프로그램 구현
         InputView.welcome();
         List<String> item = InputView.readItem();
-        System.out.println(item);
 
     }
 }
