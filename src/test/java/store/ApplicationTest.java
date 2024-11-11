@@ -54,10 +54,18 @@ class ApplicationTest extends NsTest {
     }
 
     @Test
-    void 여러_개의_일반_상품_구매_한번더() {
+    void 여러_개의_일반_상품_구매_프로모션재고부족_구매함_한번더() {
         assertSimpleTest(() -> {
-            run("[비타민워터-3],[물-2],[정식도시락-2]", "N", "Y", "[컵라면-2]", "N", "N");
+            run("[비타민워터-3],[물-2],[정식도시락-2]", "N", "Y", "[컵라면-2]", "Y", "N", "N");
             assertThat(output().replaceAll("\\s", "")).contains("내실돈18,300", "내실돈3,400");
+        });
+    }
+
+    @Test
+    void 여러_개의_일반_상품_구매_프로모션재고부족_구매안함_한번더() {
+        assertSimpleTest(() -> {
+            run("[비타민워터-3],[물-2],[정식도시락-2]", "N", "Y", "[컵라면-2]", "N", "N", "N");
+            assertThat(output().replaceAll("\\s", "")).contains("내실돈18,300", "내실돈0");
         });
     }
 

@@ -151,7 +151,7 @@ public class InputView {
             int no_promotion = user_product.getQuantity() - findMatchedPromotion(p).getMaxPromotion(p);
             OutputView.printCantPromotion(user_product.getName(), no_promotion);
             boolean yes_no = checkLimitYesNo(user_product);
-            checkLimitYesNoAct(yes_no, user_product);
+            checkLimitYesNoAct(yes_no, user_product, no_promotion);
         }
     }
 
@@ -166,27 +166,33 @@ public class InputView {
         throw new IllegalArgumentException("[ERROR] Some error is occurred in promotion limit check.");
     }
 
-    private static void checkLimitYesNoAct(boolean yes_no, Product user_product) {
+    private static void checkLimitYesNoAct(boolean yes_no, Product user_product, int no_promotion) {
         Product p = findPromotionProduct(user_product);
         Product np = findNoPromotionProduct(user_product);
         if (yes_no) {
             limitYesAct(user_product, p, np);
         }
         if (!(yes_no)) {
-            limitNoAct(user_product, p);
+            limitNoAct(user_product, p, no_promotion);
         }
     }
 
     private static void limitYesAct(Product user_product, Product p, Product np) {
-        np.minusQuantity(user_product.getQuantity() - p.getQuantity());
-        p.minusQuantity(p.getQuantity());
-        int bonus = user_product.canGet(findMatchedPromotion(p));
+        int bonus = finishPromotionQuantity(user_product, p, np);
         user_product.bonusBenefit(bonus);
         user_product.promotionOccur();
     }
 
-    private static void limitNoAct(Product user_product, Product p) {
-        p.minusQuantity(findMatchedPromotion(p).getMaxPromotion(p));
+    private static int finishPromotionQuantity(Product user_product, Product p, Product np){
+        int promotion_quantity = p.getQuantity();
+        p.minusQuantity(promotion_quantity);
+        np.minusQuantity(user_product.getQuantity() - promotion_quantity);
+        int bonus = findMatchedPromotion(p).realBonus(promotion_quantity);
+        return bonus;
+    }
+    private static void limitNoAct(Product user_product, Product p, int no_promotion) {
+        p.minusQuantity(user_product.getQuantity() - no_promotion);
+        user_product.minusQuantity(no_promotion);
         int bonus = user_product.canGet(findMatchedPromotion(p));
         user_product.bonusBenefit(bonus);
         user_product.promotionOccur();
@@ -203,12 +209,14 @@ public class InputView {
     }
 
     private static void checkBring(Product user_product) {
-        Promotion p = findMatchedPromotion((findPromotionProduct(user_product)));
-        if(user_product.omitBonus(p) != 0) {
-            checkOmitBonus(user_product, p);
-            return;
+        if(!(user_product.appliedPromotion())){
+            Promotion p = findMatchedPromotion((findPromotionProduct(user_product)));
+            if(user_product.omitBonus(p) != 0) {
+                checkOmitBonus(user_product, p);
+                return;
+            }
+            checkBonus(user_product, p);
         }
-        checkBonus(user_product, p);
     }
 
     private static void checkOmitBonus(Product user_product, Promotion p) {

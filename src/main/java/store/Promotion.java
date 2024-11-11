@@ -42,8 +42,14 @@ public class Promotion {
 
     public int realBuy(int how_many) {
         int multiple = get + buy;
-        int real_buy = (how_many / multiple) * buy + (how_many % multiple);
+        int real_buy = (how_many / multiple) * buy;
         return real_buy;
+    }
+
+    public int realBonus(int how_many) {
+        int multiple = get + buy;
+        int real_bonus = (how_many / multiple) * get;
+        return real_bonus;
     }
 
     public boolean isItOmit(int how_many) {
