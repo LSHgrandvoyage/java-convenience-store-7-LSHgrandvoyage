@@ -2,12 +2,15 @@ package store;
 
 import camp.nextstep.edu.missionutils.Console;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InputView {
     public enum ProductInfo{
@@ -75,18 +78,6 @@ public class InputView {
         clearPromotions();
     }
 
-    private static void clearUserProducts() {
-        user_products.clear();
-    }
-
-    private static void clearProducts() {
-        products.clear();
-    }
-
-    private static void clearPromotions() {
-        promotions.clear();
-    }
-
     public static List<Product> readItem() {
         System.out.println("구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])");
         String input = Console.readLine();
@@ -103,15 +94,6 @@ public class InputView {
         return user_products;
     }
 
-    private static void applyPromotion(Product user_product){
-        if(canApplyPromotion(user_product)){
-            quantityLimit(user_product);
-            checkBring(user_product);
-        }
-        if(!(canApplyPromotion(user_product)))
-            normalBuy(user_product);
-    }
-
     public static boolean canApplyPromotion(Product user_product) {
         if (findPromotionProduct(user_product) != null) {
             return true;
@@ -125,6 +107,50 @@ public class InputView {
             return discount();
         }
         return 0;
+    }
+
+    public static boolean getMembership() {
+        OutputView.printMembership();
+        String input = Console.readLine();
+        try {
+            return validateYesNo(input);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e);
+            getMembership();
+        }
+        throw new IllegalArgumentException("[ERROR] Some error is occurred in membership process.");
+    }
+
+    public static boolean validateYesNo(String input) {
+        if (input.equals("Y")) {
+            return true;
+        }
+        if (input.equals("N")) {
+            return false;
+        }
+        throw new IllegalArgumentException("[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.");
+    }
+
+
+    private static void clearUserProducts() {
+        user_products.clear();
+    }
+
+    private static void clearProducts() {
+        products.clear();
+    }
+
+    private static void clearPromotions() {
+        promotions.clear();
+    }
+
+    private static void applyPromotion(Product user_product){
+        if(canApplyPromotion(user_product)){
+            quantityLimit(user_product);
+            checkBring(user_product);
+        }
+        if(!(canApplyPromotion(user_product)))
+            normalBuy(user_product);
     }
 
     private static double discount() {
@@ -283,28 +309,6 @@ public class InputView {
             }
         }
         return null;
-    }
-
-    public static boolean getMembership() {
-        OutputView.printMembership();
-        String input = Console.readLine();
-        try {
-            return validateYesNo(input);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e);
-            getMembership();
-        }
-        throw new IllegalArgumentException("[ERROR] Some error is occurred in membership process.");
-    }
-
-    public static boolean validateYesNo(String input) {
-        if (input.equals("Y")) {
-            return true;
-        }
-        if (input.equals("N")) {
-            return false;
-        }
-        throw new IllegalArgumentException("[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.");
     }
 
     private static Product findNoPromotionProduct(Product p) {
