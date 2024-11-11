@@ -20,10 +20,8 @@ public class Promotion {
         this.end_date = end_date;
     }
 
-    public boolean isNowPromotion(LocalDate current_day) {
-        if(current_day == null){
-            current_day = LocalDate.now();
-        }
+    public boolean isNowPromotion() {
+        LocalDate current_day = LocalDate.of(2024, 2, 1);
         Date today = stringToDate(localDateToString(current_day));
         Date start = stringToDate(start_date);
         Date end = stringToDate(end_date);

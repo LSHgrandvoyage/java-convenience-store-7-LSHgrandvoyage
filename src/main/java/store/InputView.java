@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class InputView {
@@ -329,8 +327,7 @@ public class InputView {
     }
 
     private static Product checkAvailablePromotion(Promotion pro, Product product) {
-        LocalDate current_day = LocalDate.now();
-        if(pro != null && pro.isNowPromotion(current_day)){
+        if(pro != null && pro.isNowPromotion()){
             return product;
         }
         return null;
