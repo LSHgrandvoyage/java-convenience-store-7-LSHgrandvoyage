@@ -77,6 +77,10 @@ public class Product {
         promotion_flag = 1;
     }
 
+    public void promotionNoOccur() {
+        promotion_flag = 0;
+    }
+
     public boolean appliedPromotion() {
         return promotion_flag == 1;
     }

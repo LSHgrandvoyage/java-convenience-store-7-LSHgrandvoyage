@@ -245,7 +245,9 @@ public class InputView {
         user_product.minusQuantity(no_promotion);
         int bonus = user_product.canGet(findMatchedPromotion(p));
         user_product.bonusBenefit(bonus);
-        user_product.promotionOccur();
+        if(user_product.getGot_bonus() != 0){
+            user_product.promotionOccur();
+        }
     }
 
     private static void normalBuy(Product user_product) {

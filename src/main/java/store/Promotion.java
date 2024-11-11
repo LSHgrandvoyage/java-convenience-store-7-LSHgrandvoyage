@@ -40,6 +40,9 @@ public class Promotion {
     }
 
     public int realBuy(int how_many) {
+        if(how_many <= buy){
+            return how_many;
+        }
         int multiple = get + buy;
         int real_buy = (how_many / multiple) * buy;
         return real_buy;
