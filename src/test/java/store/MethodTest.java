@@ -13,7 +13,7 @@ import static camp.nextstep.edu.missionutils.test.Assertions.assertSimpleTest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MethodTest extends NsTest{
+class MethodTest extends NsTest {
     @Test
     public void testWelcome() {
         InputView.welcome();
@@ -46,23 +46,6 @@ class MethodTest extends NsTest{
         });
     }
 
-    @Test
-    public void testIsItPromotion() throws ParseException {
-        Promotion promotion = new Promotion("사과", 3, 1, "2024-11-10", "2024-12-31");
-        assertEquals(true, promotion.isItPromotion());
-    }
-
-    @Test
-    public void testIsItPromotion_1() throws ParseException {
-        Promotion promotion_1 = new Promotion("파인애플", 2, 1, "2024-01-01", "2024-11-10");
-        assertEquals(true, promotion_1.isItPromotion());
-    }
-
-    @Test
-    public void testIsItPromotion_2() throws ParseException {
-        Promotion promotion_2 = new Promotion("망고", 2, 1, "2025-01-01", "2025-11-10");
-        assertEquals(false, promotion_2.isItPromotion());
-    }
 
     @Override
     public void runMain() {

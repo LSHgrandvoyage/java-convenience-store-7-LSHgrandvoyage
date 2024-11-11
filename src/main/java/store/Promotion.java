@@ -20,12 +20,38 @@ public class Promotion {
         this.end_date = end_date;
     }
 
-    public boolean isItPromotion() throws ParseException{
+    public boolean isNowPromotion() {
         LocalDate current_day = LocalDate.now();
         Date today = stringToDate(localDateToString(current_day));
         Date start = stringToDate(this.start_date);
         Date end = stringToDate(this.end_date);
-        if(!(today.after(end)) && !(today.before(start))){
+        if (!(today.after(end)) && !(today.before(start))) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public boolean matchPromotion(String input) {
+        if (input == null) {
+            return false;
+        }
+        return input.equals(this.name);
+    }
+
+    public static int getMaxPromotion(Product product) {
+        return (product.getQuantity() / (get + buy)) * (get + buy);
+    }
+
+    public static int realBuy(int how_many) {
+        int multiple = get + buy;
+        int real_buy = (how_many / multiple) * buy + (how_many % multiple);
+        return real_buy;
+    }
+
+    public boolean isItOmit(int how_many) {
+        int multiple = get + buy;
+        if (how_many % multiple == buy) {
             return true;
         }
         return false;
@@ -33,16 +59,21 @@ public class Promotion {
 
     private static String localDateToString(LocalDate local_date) {
         String date = String.valueOf(local_date);
-        if(date == null){
+        if (date == null) {
             throw new IllegalArgumentException("[ERROR] Some error is occurred in date process");
         }
         return date;
     }
 
-    private static Date stringToDate(String string_date) throws ParseException {
+    private static Date stringToDate(String string_date) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = formatter.parse(string_date);
-        return date;
+        try {
+            Date date = formatter.parse(string_date);
+            return date;
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("[ERROR] Some error is occurred in date calculation");
+        }
+
     }
 
 }
