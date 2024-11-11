@@ -20,6 +20,7 @@ public class Application {
     private static boolean continuePurchase() {
         OutputView.printContinue();
         try {
+            InputView.renewProducts();
             return InputView.validateYesNo(Console.readLine());
         } catch (IllegalArgumentException e) {
             System.out.println(e);

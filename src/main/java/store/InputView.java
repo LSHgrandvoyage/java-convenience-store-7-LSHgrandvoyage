@@ -131,6 +131,29 @@ public class InputView {
         throw new IllegalArgumentException("[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.");
     }
 
+    public static void renewProducts() {
+        Path filePath = Paths.get("src", "main", "resources", "products.md");
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+            writer.write("name,price,quantity,promotion");
+            writer.newLine();
+            writing(writer);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("[ERROR] Some error occurred while saving the products file.");
+        }
+    }
+
+    private static void writing(BufferedWriter writer) {
+        try{
+            for (Product product : products) {
+                String product_line = product.getName() + "," + product.getPrice() + "," + product.getQuantity() + ",";
+                product_line += product.getPromotion();
+                writer.write(product_line);
+                writer.newLine();
+            }
+        }catch (IOException e){
+            throw new IllegalArgumentException("[ERROR] Some error is occurred while writing products file");
+        }
+    }
 
     private static void clearUserProducts() {
         user_products.clear();
@@ -216,6 +239,7 @@ public class InputView {
         int bonus = findMatchedPromotion(p).realBonus(promotion_quantity);
         return bonus;
     }
+
     private static void limitNoAct(Product user_product, Product p, int no_promotion) {
         p.minusQuantity(user_product.getQuantity() - no_promotion);
         user_product.minusQuantity(no_promotion);
@@ -224,13 +248,15 @@ public class InputView {
         user_product.promotionOccur();
     }
 
-
     private static void normalBuy(Product user_product) {
         if (findPromotionProduct(user_product) != null) {
             int additional_quantity = findPromotionProduct(user_product).minusQuantity(user_product);
             if (findNoPromotionProduct(user_product) != null) {
-                findNoPromotionProduct(user_product).minusQuantity(additional_quantity);
+                findNoPromotionProduct(user_product).minusQuantity(user_product.getQuantity() + additional_quantity);
             }
+        }
+        if(findPromotionProduct(user_product) == null) {
+            findNoPromotionProduct(user_product).minusQuantity(user_product.getQuantity());
         }
     }
 
@@ -253,6 +279,7 @@ public class InputView {
 
     private static void checkBonus(Product user_product, Promotion p) {
         user_product.bonusBenefit(user_product.canGet(p));
+        findPromotionProduct(user_product).minusQuantity(user_product.getQuantity());
         user_product.promotionOccur();
     }
 
@@ -268,12 +295,14 @@ public class InputView {
     }
 
     private static void checkBringYesNoAct(boolean yes_no, Product user_product, int bonus) {
-        if (yes_no) { //재고처리할것
+        if (yes_no) {
             user_product.bonusBenefit(bonus + 1);
+            findPromotionProduct(user_product).minusQuantity(user_product.getQuantity() + 1);
             user_product.promotionOccur();
         }
         if (!(yes_no)) {
             user_product.bonusBenefit(bonus);
+            findPromotionProduct(user_product).minusQuantity(user_product.getQuantity());
             user_product.promotionOccur();
         }
     }
