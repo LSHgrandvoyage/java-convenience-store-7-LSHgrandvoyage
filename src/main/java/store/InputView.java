@@ -75,6 +75,18 @@ public class InputView {
         clearPromotions();
     }
 
+    private static void clearUserProducts() {
+        user_products.clear();
+    }
+
+    private static void clearProducts() {
+        products.clear();
+    }
+
+    private static void clearPromotions() {
+        promotions.clear();
+    }
+
     public static List<Product> readItem() {
         System.out.println("구매하실 상품명과 수량을 입력해 주세요. (예: [사이다-2],[감자칩-1])");
         String input = Console.readLine();
@@ -86,15 +98,18 @@ public class InputView {
 
     public static List<Product> promoting() {
         for (Product product : user_products) {
-            if (canApplyPromotion(product)) {
-                isLimit(product);
-                checkBring(product);
-            }
-            if (!(canApplyPromotion(product))) {
-                normalBuy(product);
-            }
+            applyPromotion(product);
         }
         return user_products;
+    }
+
+    private static void applyPromotion(Product user_product){
+        if(canApplyPromotion(user_product)){
+            quantityLimit(user_product);
+            checkBring(user_product);
+        }
+        if(!(canApplyPromotion(user_product)))
+            normalBuy(user_product);
     }
 
     public static boolean canApplyPromotion(Product user_product) {
@@ -110,18 +125,6 @@ public class InputView {
             return discount();
         }
         return 0;
-    }
-
-    private static void clearUserProducts() {
-        user_products.clear();
-    }
-
-    private static void clearProducts() {
-        products.clear();
-    }
-
-    private static void clearPromotions() {
-        promotions.clear();
     }
 
     private static double discount() {
@@ -142,7 +145,7 @@ public class InputView {
         return pure_total;
     }
 
-    private static void isLimit(Product user_product) {
+    private static void quantityLimit(Product user_product) {
         if (!(findPromotionProduct(user_product).canBuy(user_product))) {
             Product p = findPromotionProduct(user_product);
             int no_promotion = user_product.getQuantity() - findMatchedPromotion(p).getMaxPromotion(p);
@@ -158,7 +161,7 @@ public class InputView {
             return yes_no;
         } catch (IllegalArgumentException e) {
             System.out.println(e);
-            isLimit(user_product);
+            quantityLimit(user_product);
         }
         throw new IllegalArgumentException("[ERROR] Some error is occurred in promotion limit check.");
     }
@@ -167,14 +170,26 @@ public class InputView {
         Product p = findPromotionProduct(user_product);
         Product np = findNoPromotionProduct(user_product);
         if (yes_no) {
-            np.minusQuantity(user_product.getQuantity() - p.getQuantity());
-            p.minusQuantity(p.getQuantity());
-            user_product.promotionOccur();
+            limitYesAct(user_product, p, np);
         }
         if (!(yes_no)) {
-            p.minusQuantity(findMatchedPromotion(p).getMaxPromotion(p));
-            user_product.promotionOccur();
+            limitNoAct(user_product, p);
         }
+    }
+
+    private static void limitYesAct(Product user_product, Product p, Product np) {
+        np.minusQuantity(user_product.getQuantity() - p.getQuantity());
+        p.minusQuantity(p.getQuantity());
+        int bonus = user_product.canGet(findMatchedPromotion(p));
+        user_product.bonusBenefit(bonus);
+        user_product.promotionOccur();
+    }
+
+    private static void limitNoAct(Product user_product, Product p) {
+        p.minusQuantity(findMatchedPromotion(p).getMaxPromotion(p));
+        int bonus = user_product.canGet(findMatchedPromotion(p));
+        user_product.bonusBenefit(bonus);
+        user_product.promotionOccur();
     }
 
 
@@ -188,15 +203,23 @@ public class InputView {
     }
 
     private static void checkBring(Product user_product) {
-        if (!(user_product.appliedPromotion())) {
-            int bonus = user_product.canGet(findMatchedPromotion((user_product)));
-            String user_name = user_product.getName();
-            if (user_product.omitBonus(findMatchedPromotion(user_product)) != 0) {
-                OutputView.printBring(user_name, user_product.omitBonus(findMatchedPromotion(user_product)));
-                boolean yes_no = checkBringYesNo(user_product);
-                checkBringYesNoAct(yes_no, user_product, bonus);
-            }
+        Promotion p = findMatchedPromotion((findPromotionProduct(user_product)));
+        if(user_product.omitBonus(p) != 0) {
+            checkOmitBonus(user_product, p);
+            return;
         }
+        checkBonus(user_product, p);
+    }
+
+    private static void checkOmitBonus(Product user_product, Promotion p) {
+        OutputView.printBring(user_product.getName(), user_product.omitBonus(p));
+        boolean yes_no = checkBringYesNo(user_product);
+        checkBringYesNoAct(yes_no, user_product, user_product.canGet(p));
+    }
+
+    private static void checkBonus(Product user_product, Promotion p) {
+        user_product.bonusBenefit(user_product.canGet(p));
+        user_product.promotionOccur();
     }
 
     private static boolean checkBringYesNo(Product user_product) {
@@ -211,7 +234,7 @@ public class InputView {
     }
 
     private static void checkBringYesNoAct(boolean yes_no, Product user_product, int bonus) {
-        if (yes_no) {
+        if (yes_no) { //재고처리할것
             user_product.bonusBenefit(bonus + 1);
             user_product.promotionOccur();
         }
@@ -287,10 +310,17 @@ public class InputView {
 
     private static Product findPromotionProduct(Product p) {
         for (Product product : products) {
-            Promotion pro = findMatchedPromotion(p);
-            if (product.isItName(p) && product.isItPromotion() && pro != null && pro.isNowPromotion()) {
-                return product;
+            if(product.isItName(p) && product.isItPromotion()){
+                Promotion pro = findMatchedPromotion(product);
+                return checkAvailablePromotion(pro, product);
             }
+        }
+        return null;
+    }
+
+    private static Product checkAvailablePromotion(Promotion pro, Product product) {
+        if(pro != null && pro.isNowPromotion()){
+            return product;
         }
         return null;
     }

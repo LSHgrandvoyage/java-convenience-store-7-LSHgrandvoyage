@@ -31,7 +31,7 @@ public class Product {
     }
 
     public Promotion isItPromotion(Promotion p) {
-        if (p.matchPromotion(this.promotion)) {
+        if (p.matchPromotion(promotion)) {
             return p;
         }
         return null;
@@ -95,6 +95,10 @@ public class Product {
 
     public int getGot_bonus() {
         return got_bonus;
+    }
+
+    public String getPromotion() {
+        return promotion;
     }
 }
 

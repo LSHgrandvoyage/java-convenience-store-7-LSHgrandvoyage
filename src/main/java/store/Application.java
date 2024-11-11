@@ -10,9 +10,9 @@ public class Application {
         while (continue_purchase_flag) {
             InputView.welcome();
             List<Product> original_items = InputView.readItem();
-            List<Product> items = InputView.promoting();
+            List<Product> promotioned_items = InputView.promoting();
             double discount = InputView.membershipping();
-            OutputView.printBills(original_items, items, discount);
+            OutputView.printBills(original_items, promotioned_items, discount);
             continue_purchase_flag = continuePurchase();
         }
     }

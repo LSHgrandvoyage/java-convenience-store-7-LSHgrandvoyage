@@ -6,11 +6,11 @@ import java.time.LocalDate;
 import java.util.Date;
 
 public class Promotion {
-    private static String name;
-    private static int buy;
-    private static int get;
-    private static String start_date;
-    private static String end_date;
+    private final String name;
+    private final int buy;
+    private final int get;
+    private final String start_date;
+    private final String end_date;
 
     Promotion(String name, int buy, int get, String start_date, String end_date) {
         this.name = name;
@@ -23,8 +23,8 @@ public class Promotion {
     public boolean isNowPromotion() {
         LocalDate current_day = LocalDate.now();
         Date today = stringToDate(localDateToString(current_day));
-        Date start = stringToDate(this.start_date);
-        Date end = stringToDate(this.end_date);
+        Date start = stringToDate(start_date);
+        Date end = stringToDate(end_date);
         if (!(today.after(end)) && !(today.before(start))) {
             return true;
         }
@@ -33,17 +33,14 @@ public class Promotion {
 
 
     public boolean matchPromotion(String input) {
-        if (input == null) {
-            return false;
-        }
-        return input.equals(this.name);
+        return input != null && input.equals(name);
     }
 
-    public static int getMaxPromotion(Product product) {
+    public int getMaxPromotion(Product product) {
         return (product.getQuantity() / (get + buy)) * (get + buy);
     }
 
-    public static int realBuy(int how_many) {
+    public int realBuy(int how_many) {
         int multiple = get + buy;
         int real_buy = (how_many / multiple) * buy + (how_many % multiple);
         return real_buy;
